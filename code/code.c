@@ -1,15 +1,30 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
-int isAllFilled(**puzzle, int p, int k);
+//int isAllFilled(**puzzle, int p, int k);
+
+void printPuzzle(char **p, int rows, int cols){
+	int i,j;
+
+	printf("\n\n");
+	for(i=0;i<rows;i++){
+		for(j=0;j<cols;j++){
+			printf("%c", p[i][j]);
+		}	
+		printf("\n");
+	}	
+	return;
+}
+
 
 int main(){
 	FILE *fp;
 	char buffer[100][100] = {};			// Assumption
 	char word[100];							// Assumption
 	int mode = 0, i=0, j=0, w=0;
-	int puzCount = 0, maxPuzzle;
+	int rows = 0, cols;
 	int wordCount = 0, wordsSuccess=0;
 	int len=0;
 
@@ -40,12 +55,12 @@ int main(){
 				// Not an empty line
 				buffer[i][j] = '\0';
 
-				if(mode==0) {
-					puzCount++;
+				if(mode==0) {									// mode0 = puzzle
+					rows++;
 					len = strlen(buffer[i]);
-					maxPuzzle = (len>maxPuzzle) ? len : maxPuzzle ;
+					cols = (len>cols) ? len : cols ;
 				}
-				if(mode==1) wordCount++;
+				if(mode==1) wordCount++;					// mode1=words
 			}
 			i++;j=0;
 
@@ -54,12 +69,12 @@ int main(){
 		}
 	}
 	
-	printf("puzzle=%d word=%d maxPuzzle=%d\n\n", puzCount, wordCount, maxPuzzle);
+	printf("puzzle=%d word=%d cols=%d\n\n", rows, wordCount, cols);
 
 	//format puzzle for best view
-	for(i=0;i<puzCount;i++){
-		for(j=0;j<maxPuzzle;j++){
-			if( !(buffer[i][j]=='*' || buffer[i][j]=='#')){
+	for(i=0;i<rows;i++){
+		for(j=0;j<cols;j++){
+				if( !(buffer[i][j]=='*' || buffer[i][j]=='#')){
 				buffer[i][j]='*';
 			}
 		}
@@ -67,27 +82,51 @@ int main(){
 	
 	// print puzzle
 	printf("Puzzle:\n");
-	for(i=0;i<puzCount;i++){
+	for(i=0;i<rows;i++){
 		printf("%s\n", buffer[i]);
 	}	
+
+	/***********************************************************************************/
+
+	char **p;
+
+	// for any number of rows & columns this will work
+	p = (char **)malloc(rows*sizeof(char *));
+	for(i=0;i<rows;i++){
+		 *(p+i) = (char *)malloc(cols*sizeof(char));
+	}
+
+	for(i=0;i<rows;i++){
+		for(j=0;j<cols;j++){
+			p[i][j] = buffer[i][j];
+		}	
+	}	
+
+	printPuzzle(p,rows,cols);
+
+
+
+
+
 
 	/*
 	// print words
 	printf("\nWords:\n");
 	for(i=0;i<wordCount;i++){
-		printf("%s\n", buffer[puzCount + 1 + i]);
+		printf("%s\n", buffer[rows + 1 + i]);
 	}
 	*/
 
+	/*
 	// Try to fix words horizontly
 	for(w=0;w<wordCount;w++){							//<-- words
 
-		strcpy(word, buffer[puzCount + 1 + w]);
+		strcpy(word, buffer[rows + 1 + w]);
 		len = strlen(word);
 		printf("word=%s length=%d\n", word, len);
 
-		for(i=0;i<puzCount;i++){						// <-- each lines
-			for(int j=0;j<=(maxPuzzle-len);j++){		// <-- each character
+		for(i=0;i<rows;i++){						// <-- each lines
+			for(int j=0;j<=(cols-len);j++){		// <-- each character
 
 				if(buffer[i][j]=='#'){
 					// now find a *, lets look right for how many * points
@@ -124,7 +163,7 @@ int main(){
 
 	// print puzzle
 	printf("\n\n\nPuzzle:\n");
-	for(i=0;i<puzCount;i++){
+	for(i=0;i<rows;i++){
 		printf("%s\n", buffer[i]);
 	}	
 
@@ -132,21 +171,9 @@ int main(){
 		printf("\nINCOMPLETE\n");
 	}
 
-	isAllFilled(&buffer, puzCount, maxPuzzle);
+	isAllFilled(&buffer, rows, cols);
+*/
 	return 0;
-}
-
-
-int isAllFilled(*puzzle, int p, int k){
-
-	int i, k;
-
-	for(i=0;i<p;i++){
-		for(int j=0;j<k;j++){
-			printf("%c", puzzle[i,k]);
-		}
-		printf("\n");
-	}
 }
 
 
