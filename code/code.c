@@ -167,7 +167,7 @@ int main(){
 		//printf(" %d %d %d\n", i, wordMap[i], myWordMap[i]);
 
 		if(wordMap[i]>1){
-			// impossible according to hackerrank
+			// impossible according to hackerrank,,REM:
 			for(i=0;i<rows;i++){
 				printf("%s\n", buffer[i]);
 			}	
