@@ -4,30 +4,15 @@
 #include <stdlib.h>
 #include <ctype.h>
 
-#define MAX_CHARS 10
+#define MAX_CHARS 30
 
-int debug=0;
+int debug=1;
 int readFromFile = 1;
-
-
-void printPuzzle(char **p, int rows, int cols){
-	int i,j;
-
-	for(i=0;i<rows;i++){
-		printf(" ");
-		for(j=0;j<cols;j++){
-			printf("%c", p[i][j]);
-		}	
-		printf("\n");
-	}	
-	return;
-}
-
 
 int main(){
 	FILE *fp;
 	char buffer[20][20] = {};			// Assumption
-	char word[100];							// Assumption
+	char word[100];						// Assumption
 	int mode = 0, i=0, j=0, w1=0;
 	int rows = 0, cols=0;
 	int wordCount = 0, wordsSuccess=0;
@@ -35,13 +20,13 @@ int main(){
 
 	if(debug) printf(">>Enter Puzzle:\n");
 
-	if(readFromFile){
-		fp = fopen("test02.inp", "r");
+	if(readFromFile==1){
+		fp = fopen("test06.inp", "r");
 	}
 
 	while(mode!=2){
 
-		if(readFromFile){
+		if(readFromFile==1){
 			fscanf(fp, "%c", &buffer[i][j]);
 		}else{
 			scanf("%c", &buffer[i][j]);
@@ -165,6 +150,7 @@ int main(){
 
 		if(wordMap[i]>1){
 			// impossible according to hackerrank
+			printf("Hackerrank\n");
 			for(i=0;i<rows;i++){
 				printf("%s\n", buffer[i]);
 			}	
@@ -172,7 +158,7 @@ int main(){
 
 		}else if (wordMap[i] > myWordMap[i]){
 			printf("IMPOSSIBLE\n");
-			//return 0;
+			return 0;
 		}
 	}
 
@@ -196,7 +182,7 @@ int main(){
 					// try to fit it on horizontal axis
 					int j2=j,possible=1; 
 
-					while (j2<(len+j) && possible==1){
+					while (j2<(len+j) && possible==1){ //j2<(len+j)
 						// try to increase and check work can be fit or not
 
 						if(!(buffer[i][j2] == '#' || buffer[i][j2] == word[j2-j])){
@@ -255,9 +241,6 @@ int main(){
 	for(i=0;i<rows;i++){
 		printf("%s\n", buffer[i]);
 	}	
-
-
-	//printPuzzle(p, rows, cols);
 
 
 	return 0;
