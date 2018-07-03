@@ -4,18 +4,18 @@
 #include <stdlib.h>
 #include <ctype.h>
 
-#define MAX_CHARS 30
+#define MAX_CHARS 50
 
-int debug=1;
-int readFromFile = 1;
+int debug=0;
+int readFromFile = 0;
 
 int main(){
 	FILE *fp;
-	char buffer[20][20] = {};			// Assumption
-	char word[100];						// Assumption
+	char buffer[MAX_CHARS][50] = {};			// Assumption
+	char word[MAX_CHARS];						// Assumption
 	int mode = 0, i=0, j=0, w1=0;
 	int rows = 0, cols=0;
-	int wordCount = 0, wordsSuccess=0;
+	int wordCount = 0;
 	int len=0;
 
 	if(debug) printf(">>Enter Puzzle:\n");
@@ -34,15 +34,12 @@ int main(){
 
       buffer[i][j] = toupper(buffer[i][j]);
         
-		if(buffer[i][j]=='\n'){	// Newline
-			
-			if((buffer[i][0]=='\n')){
-				// Empty line		
+		if(buffer[i][j]=='\n'){
+			if((buffer[i][0]=='\n')){	
 				mode++;
 				if(mode==1){
 					if(debug) printf(">> Enter words:\n");
 				}
-
 			}else{
 				// Not an empty line
 				buffer[i][j] = '\0';
@@ -50,7 +47,7 @@ int main(){
 				if(mode==0) {									// mode0 = puzzle
 					rows++;
 					len = strlen(buffer[i]);
-					cols = (len>cols) ? len : cols ;
+					cols = (len>cols) ? len : cols;
 				}
 				if(mode==1) wordCount++;					// mode1=words
 			}
@@ -68,11 +65,10 @@ int main(){
 	char **p, **w;
 	int *wLen;
 
-	int totalChars = 0,wordCounter = 0;
+	int wordCounter = 0;
 	int wordMap[MAX_CHARS] = {0};
 	int myWordMap[MAX_CHARS] = {0};
 
-	// for any number of rows & columns this will work
 	p = (char **)malloc(rows*sizeof(char *));
 	for(i=0;i<rows;i++){
 		 *(p+i) = (char *)malloc(cols*sizeof(char));
@@ -84,7 +80,6 @@ int main(){
 		}	
 	}	
 
-	// for any number of rows & columns this will work
 	w = (char **)malloc(wordCount*sizeof(char *));
 	wLen = (int *)malloc(wordCount*sizeof(int));
 
@@ -96,22 +91,20 @@ int main(){
 	int index=0;
 	for(int j=0;j<MAX_CHARS;j++){
 		for(i=0;i<wordCount;i++){
-
 			if(strlen(buffer[rows + 1 + i])==j){
 				strcpy(w[index],buffer[rows + 1 + i]);
 				wordMap[j]++;
 				wLen[index] = j;
 				index++;
 			}
-
 		}
 	}
+
 	/***********************************************************************************/
 
 	// Go horizontaly
 	for(i=0;i<rows;i++){
 		for(int j=0;j<cols-1;j++){
-
 			if(p[i][j]=='#' && p[i][j+1]=='#'){
 				// now found a #, lets look right for how many # points
 				wordCounter = 0;
@@ -120,7 +113,6 @@ int main(){
 					wordCounter++;
 					j++;
 				}
-
 				myWordMap[wordCounter]++;
 			}
 		}
@@ -129,7 +121,6 @@ int main(){
 	// Go vertically
 	for(i=0;i<cols;i++){					
 		for(int j=0;j<rows-1;j++){	
-
 			if(p[j][i]=='#' && p[j+1][i]=='#'){
 				// now found a #, lets look right for how many # points
 				wordCounter = 0;
@@ -143,14 +134,11 @@ int main(){
 		}
 	}
 
-	//printf("Word Map\n");
-
 	for(int i=0;i<MAX_CHARS;i++){
 		//if (debug) printf(" %d - %d %d\n", i, wordMap[i], myWordMap[i]);
 
 		if(wordMap[i]>1){
 			// impossible according to hackerrank
-			printf("Hackerrank\n");
 			for(i=0;i<rows;i++){
 				printf("%s\n", buffer[i]);
 			}	
@@ -182,8 +170,8 @@ int main(){
 					// try to fit it on horizontal axis
 					int j2=j,possible=1; 
 
-					while (j2<(len+j) && possible==1){ //j2<(len+j)
-						// try to increase and check work can be fit or not
+					while (j2<(len+j) && possible==1){ 
+						// try to increase and check word can be fit or not
 
 						if(!(buffer[i][j2] == '#' || buffer[i][j2] == word[j2-j])){
 							possible = 0;
@@ -193,7 +181,7 @@ int main(){
 					}
 
 					if (possible==1 && (buffer[i][j+len] == '*' || buffer[i][j+len] == 0) && (j==0 || buffer[i][j-1]!='#')){
-						if(debug) printf(" Possible\n");
+						if(debug) printf(" Possible Situation\n");
 						
 						for (int j2=0;j2<len;j2++){
 							buffer[i][j + j2] = word[j2];
@@ -201,13 +189,11 @@ int main(){
 						used = 1;
 						break;
 					}
-					if(debug) printf("\n");
 
-					if (debug) printf("  %d %d down  >> ", i, j);
+					if (debug) printf("\n  %d %d down  >> ", i, j);
 
 					// Try to fix it on verticle axis
-					int i2=i;
-					possible = 1;
+					int i2=i; possible = 1;
 
 					while (i2<(len+i) && possible==1){
 						// try to increase and check work can be fit or not
@@ -240,8 +226,7 @@ int main(){
 	//printf("\n\n\nPuzzle:\n");
 	for(i=0;i<rows;i++){
 		printf("%s\n", buffer[i]);
-	}	
-
+	}
 
 	return 0;
 }
