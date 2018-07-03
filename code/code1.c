@@ -7,7 +7,7 @@
 #define MAX_CHARS 10
 
 int debug=0;
-int readFromFile = 1;
+int readFromFile = 0;
 
 
 void printPuzzle(char **p, int rows, int cols){
@@ -36,7 +36,7 @@ int main(){
 	if(debug) printf(">>Enter Puzzle:\n");
 
 	if(readFromFile){
-		fp = fopen("test02.inp", "r");
+		fp = fopen("test01.inp", "r");
 	}
 
 	while(mode!=2){
@@ -77,12 +77,19 @@ int main(){
 	}
 	
 	if(debug) printf("puzzle=%d word=%d cols=%d\n\n", rows, wordCount, cols);
+
+	//format puzzle for best view
+	/*for(i=0;i<rows;i++){
+		for(j=0;j<cols;j++){
+				if( !(buffer[i][j]=='*' || buffer[i][j]=='#')){
+				buffer[i][j]='*';
+			}
+		}
+	}*/
 	
 	/***********************************************************************************/
 
 	char **p, **w;
-	int *wLen;
-
 	int totalChars = 0,wordCounter = 0;
 	int wordMap[MAX_CHARS] = {0};
 	int myWordMap[MAX_CHARS] = {0};
@@ -101,8 +108,6 @@ int main(){
 
 	// for any number of rows & columns this will work
 	w = (char **)malloc(wordCount*sizeof(char *));
-	wLen = (int *)malloc(wordCount*sizeof(int));
-
 	for(i=0;i<wordCount;i++){
 		 *(w+i) = (char *)malloc(strlen(buffer[rows + 1 + i])*sizeof(char));
 	}
@@ -114,8 +119,7 @@ int main(){
 
 			if(strlen(buffer[rows + 1 + i])==j){
 				strcpy(w[index],buffer[rows + 1 + i]);
-				wordMap[j]++;
-				wLen[index] = j;
+				wordMap[strlen(w[i])]++;
 				index++;
 			}
 
@@ -161,7 +165,7 @@ int main(){
 	//printf("Word Map\n");
 
 	for(int i=0;i<MAX_CHARS;i++){
-		//if (debug) printf(" %d - %d %d\n", i, wordMap[i], myWordMap[i]);
+		//printf(" %d %d %d\n", i, wordMap[i], myWordMap[i]);
 
 		if(wordMap[i]>1){
 			// impossible according to hackerrank
@@ -172,84 +176,85 @@ int main(){
 
 		}else if (wordMap[i] > myWordMap[i]){
 			printf("IMPOSSIBLE\n");
-			//return 0;
+			return 0;
 		}
 	}
 
 	/***********************************************************************************/
 
-	for(w1=0;w1<wordCount;w1++){	
-		int len  = wLen[w1];
-		char word[MAX_CHARS];
-		int used = 0;
 
-		strcpy(word, w[w1]);
-		if (debug) printf("\n%s (%d)> \n", word, len);
 
-		for(i=0;i<rows;i++){							// <-- each row
-			for(int j=0;j<=cols;j++){				// <-- each col
-				
-				if (buffer[i][j] == '#' || buffer[i][j]== word[0]){
 
-					if (debug) printf("  %d %d right >> ", i, j);
+	// Try to fix words horizontly
+	for(w1=0;w1<wordCount;w1++){							//<-- words
+      int used=0;
 
-					// try to fit it on horizontal axis
-					int j2=j,possible=1; 
+		strcpy(word, buffer[rows + 1 + w1]);
+		len = strlen(word);
+		//printf("word=%s length=%d\n", word, len);
 
-					while (j2<(len+j) && possible==1){
-						// try to increase and check work can be fit or not
+		for(i=0;i<rows;i++){						// <-- each lines
+			for(int j=0;j<=(cols-len);j++){		// <-- each character
 
-						if(!(buffer[i][j2] == '#' || buffer[i][j2] == word[j2-j])){
-							possible = 0;
-						}
-						if(debug) printf(" (%c)", buffer[i][j2]);
-						j2++;
+				// Try to fill horizontally
+				if(buffer[i][j]=='#' && buffer[i][j+1]!='*'){
+					// now find a *, lets look right for how many * points
+					int wordCounter = 0;
+
+					while (buffer[i][j] == '#'){
+						wordCounter++;
+						j++;
 					}
 
-					if (possible==1 && (buffer[i][j+len] == '*' || buffer[i][j+len] == 0) && (j==0 || buffer[i][j-1]!='#')){
-						if(debug) printf(" Possible\n");
-						
-						for (int j2=0;j2<len;j2++){
-							buffer[i][j + j2] = word[j2];
-						}
-						used = 1;
-						break;
-					}
-					if(debug) printf("\n");
+					//printf("len=%d wordCounter=%d\n", len, wordCounter);
+					j = j - wordCounter;
 
-					if (debug) printf("  %d %d down  >> ", i, j);
+					if(len==wordCounter && used == 0){
+						// Can fit into matrix
+						wordsSuccess++;
+                  used = 1;
 
-					// Try to fix it on verticle axis
-					int i2=i;
-					possible = 1;
-
-					while (i2<(len+i) && possible==1){
-						// try to increase and check work can be fit or not
-
-						if(!(buffer[i2][j] == '#' || buffer[i2][j] == word[i2-i])){
-							possible = 0;
-						}
-						if(debug) printf(" (%c)", buffer[i2][j]);
-						i2++;
+						while (buffer[i][j] == '#'){
+							//printf("%c", word[len-wordCounter]);
+							buffer[i][j] = word[len-wordCounter];
+							j++;
+							wordCounter--;
+						}	
+                        
 					}
 
-					if (possible==1 && (buffer[i+len][j] == '*' || buffer[i+len][j] == 0) && (i==0 || buffer[i-1][j]!='#')){
-						if(debug) printf(" Possible\n");
-						
-						for (int i2=0;i2<len;i2++){
-							buffer[i + i2][j] = word[i2];
-						}
-						used = 1;
-						break;
-					}
-					if(debug) printf("\n");
+					j = j+len;
+					//printf("line=%s j=%d empty slots=%d\n", buffer[i], j,  wordCounter);
 
+
+				}else if(buffer[i][j]!='*' && buffer[i+1][j]!='*' && (i==0 || buffer[i-1][j] != '#')){
+					// now find a *, lets look right for how many * points
+					int wordCounter = 0;
+
+					while (buffer[i + wordCounter][j] == '#'){
+						wordCounter++;
+					}
+
+					//printf("len=%d wordCounter=%d\n", len, wordCounter);
+
+					if(len==wordCounter && used == 0){
+						// Can fit into matrix
+						wordsSuccess++;
+                  used = 1;
+
+						while (wordCounter >= 0){
+							//printf("%c", word[len-wordCounter]);
+							buffer[i + len-wordCounter][j] = word[len-wordCounter];
+							wordCounter--;
+						}	
+                        
+					}
+
+					//printf("line=%s j=%d empty slots=%d\n", buffer[i], j,  wordCounter);
 				}
 			}
 		}
 	}
-
-	if(debug) printf("\n");
 
 	//printf("\n\n\nPuzzle:\n");
 	for(i=0;i<rows;i++){
