@@ -161,7 +161,7 @@ int main(){
 			}
 			return 0;*/
 
-		}else if (wordMap[i] > myWordMap[i]){
+		}else if (wordMap[i] > myWordMap[i] && i>1){
 			printf("IMPOSSIBLE\n");
 			return 0;
 		}
