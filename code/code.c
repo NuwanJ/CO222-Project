@@ -159,8 +159,8 @@ int main(){
 			/*for(i=0;i<rows;i++){
 				printf("%s\n", buffer[i]);
 			}
-			return 0;
-*/
+			return 0;*/
+
 		}else if (wordMap[i] > myWordMap[i]){
 			printf("IMPOSSIBLE\n");
 			return 0;
@@ -193,8 +193,9 @@ int main(){
 		strcpy(word, w[w1]);
 		if (debug) printf("\n%s (%d)> \n", word, len);
 
-		if(wordMap[i]>1){
-				//worker(rows, cols, p, word, len, 1);
+		if(wordMap[len]>1){
+				//printf(">>%s\n", word);
+				worker(rows, cols, p, word, len, 1);
 		}
 	}
 
@@ -210,7 +211,7 @@ int main(){
 
 int worker(int rows, int cols, char **buffer, char *word, int len, int round){
 
-	int i,j,used=0, linkedLetter=0;
+	int i,j,used=0, linkedLetters=0;
 
 	for(i=0;i<rows;i++){							// <-- each row
 
@@ -228,7 +229,10 @@ int worker(int rows, int cols, char **buffer, char *word, int len, int round){
 
 				while (j2<(len+j) && possible==1){	// try to increase and check word can be fit or not
 
-					if (buffer[i][j2] == word[j2-j]) linkedLetter++;		// Find is there any linked leters
+					if (buffer[i][j2] == word[j2-j]){
+						linkedLetters++;		// Find is there any linked leters
+						//printf(">> %d %d (%d)\n", i, j, linkedLetters);
+					}
 
 					if(!(buffer[i][j2] == '#' || buffer[i][j2] == word[j2-j])){
 						possible = 0;
@@ -239,7 +243,7 @@ int worker(int rows, int cols, char **buffer, char *word, int len, int round){
 				}
 
 				// round=0 > fill it. round==1 > fill only if exist a linked letter
-				if (possible==1 && (buffer[i][j+len] == '*' || buffer[i][j+len] == 0) && (j==0 || buffer[i][j-1]!='#') && (round==0 || (round==1 && linkedLetter>0))){
+				if (possible==1 && ((j+len)>=cols || (buffer[i][j+len] == '*' || buffer[i][j+len] == 0)) && (j==0 || buffer[i][j-1]!='#') && (round==0 || (round==1 && linkedLetters>0))){
 					if(debug) printf(" Possible >\n");
 
 					for (int j2=0;j2<len;j2++){
@@ -252,14 +256,17 @@ int worker(int rows, int cols, char **buffer, char *word, int len, int round){
 				if (debug) printf("\n  %d %d down  >> ", i, j);
 
 				// Try to fix it on verticle axis
-				int i2=i; possible = 1;linkedLetter=0;
+				int i2=i; possible = 1;linkedLetters=0;
 
 				if(i+len>rows) possible=0;						// impossible if not enough rows
 				if(used==1) possible = 0; 						// Because already used
 
 				while (i2<(len+i) && possible==1){		// try to increase and check work can be fit or not
 
-					if (buffer[i][j2] == word[j2-j]) linkedLetter++;		// Find is there any linked leters
+					if (buffer[i][j2] == word[j2-j]) {
+						linkedLetters++;		// Find is there any linked leters
+						//printf(">> %d %d (%d)\n", i, j, linkedLetters);
+					}
 
 					if(!(buffer[i2][j] == '#' || buffer[i2][j] == word[i2-i])){
 						possible = 0;
@@ -270,7 +277,7 @@ int worker(int rows, int cols, char **buffer, char *word, int len, int round){
 				}
 
 				// round=0 > fill it. round==1 > fill only if exist a linked letter
-				if (possible==1 && (buffer[i+len][j] == '*' || buffer[i+len][j] == 0) && (i==0 || buffer[i-1][j]!='#') && (round==0 || linkedLetter>0)){
+				if (possible==1 && ( (i+len >= rows) || (buffer[i+len][j] == '*' || buffer[i+len][j] == 0)) && (i==0 || buffer[i-1][j]!='#') && (round==0 || (round==1 && linkedLetters>0))){
 					if(debug) printf(" Possible v\n");
 
 					for (int i2=0;i2<len;i2++){
