@@ -9,7 +9,7 @@
 int worker(int rows, int cols, char **buffer, char *word, int len);
 
 int debug=1;
-int readFromFile = 0;
+int readFromFile = 1;
 
 int main(){
 	FILE *fp;
@@ -23,7 +23,7 @@ int main(){
 	if(debug) printf(">>Enter Puzzle:\n");
 
 	if(readFromFile==1){
-		fp = fopen("test06.inp", "r");
+		fp = fopen("test01.inp", "r");
 	}
 
 	while(mode!=2){
@@ -137,6 +137,17 @@ int main(){
 		}
 	}
 
+	// Count individual #
+	for(i=0;i<cols;i++){					
+		for(int j=0;j<rows-1;j++){	
+			if(p[i][j]=='#' && ((p[i][j+1]=='*' || p[i][j+1]=='\0') && (p[i+1][j]=='*' || p[i+1][j]=='\0'))){
+				printf(">> %d %d \n", i,j);
+				myWordMap[1]++;
+			}
+		}
+	}
+
+
 	for(int i=0;i<MAX_CHARS;i++){
 		//if (debug) printf(" %d - %d %d\n", i, wordMap[i], myWordMap[i]);
 
@@ -165,68 +176,6 @@ int main(){
 
 
 		worker(rows, cols, p, word, len);
-
-		/*for(i=0;i<rows;i++){							// <-- each row
-			for(int j=0;j<=cols;j++){				// <-- each col
-				
-				if (buffer[i][j] == '#' || buffer[i][j]== word[0]){
-
-					if (debug) printf("  %d %d right >> ", i, j);
-
-					// try to fit it on horizontal axis
-					int j2=j,possible=1; 
-
-					while (j2<(len+j) && possible==1){ 
-						// try to increase and check word can be fit or not
-
-						if(!(buffer[i][j2] == '#' || buffer[i][j2] == word[j2-j])){
-							possible = 0;
-							break;				// Stop further checking
-						}
-						if(debug) printf(" (%c)", buffer[i][j2]);
-						j2++;
-					}
-
-					if (possible==1 && (buffer[i][j+len] == '*' || buffer[i][j+len] == 0) && (j==0 || buffer[i][j-1]!='#')){
-						if(debug) printf(" Possible Situation\n");
-						
-						for (int j2=0;j2<len;j2++){
-							buffer[i][j + j2] = word[j2];
-						}
-						used = 1;
-						break;
-					}
-
-					if (debug) printf("\n  %d %d down  >> ", i, j);
-
-					// Try to fix it on verticle axis
-					int i2=i; possible = 1;
-
-					while (i2<(len+i) && possible==1){
-						// try to increase and check work can be fit or not
-
-						if(!(buffer[i2][j] == '#' || buffer[i2][j] == word[i2-i])){
-							possible = 0;
-							break;				// Stop further checking
-						}
-						if(debug) printf(" (%c)", buffer[i2][j]);
-						i2++;
-					}
-
-					if (possible==1 && (buffer[i+len][j] == '*' || buffer[i+len][j] == 0) && (i==0 || buffer[i-1][j]!='#')){
-						if(debug) printf(" Possible\n");
-						
-						for (int i2=0;i2<len;i2++){
-							buffer[i + i2][j] = word[i2];
-						}
-						used = 1;
-						break;
-					}
-					if(debug) printf("\n");
-
-				}
-			}
-		}*/
 
 	}
 
@@ -304,6 +253,10 @@ int worker(int rows, int cols, char **buffer, char *word, int len){
 					break;
 				}
 				if(debug) printf("\n");
+
+			}else if (buffer[i][j]=='#' && ((buffer[i][j+1]=='*' || buffer[i][j+1]=='\0') && (buffer[i+1][j]=='*' || buffer[i+1][j]=='\0')) && len==1){
+				// Single character word
+				buffer[i][j] = word[0];
 			}
 		}
 	}
