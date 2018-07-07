@@ -161,7 +161,7 @@ int main(){
 			}
 			return 0;*/
 
-		}else if (wordMap[i] > myWordMap[i] && i>1){
+		}else if (wordMap[i] > myWordMap[i]){
 			printf("IMPOSSIBLE\n");
 			return 0;
 		}
@@ -170,6 +170,7 @@ int main(){
 	/***********************************************************************************/
 
 	for(w1=wordCount-1;w1>=0;w1--){
+    //for(w1=0;w1<wordCount;w1++){
 		int len  = wLen[w1];
 		char word[MAX_CHARS];
 
@@ -185,8 +186,10 @@ int main(){
 
 	}
 
-	// second round filling
-	for(w1=wordCount-1;w1>=0;w1--){
+	// second round filling for words with length=1
+    
+	//for(w1=wordCount-1;w1>=0;w1--){
+    for(w1=0;w1<wordCount;w1++){
 		int len  = wLen[w1];
 		char word[MAX_CHARS];
 
