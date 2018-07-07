@@ -144,6 +144,9 @@ int main(){
 				if (i>0 && p[i-1][j]!='#') ok++; 		// ^
 				if (i<rows-1 && p[i+1][j]!='#') ok++; 	// V
 
+				if(j==0 || j==cols-1) ok++;				// add missed values
+				if(i==0 || i==rows-1) ok++;				// add missed values
+				
 				if(ok==4){
 					myWordMap[1]++;
 					if(debug) printf(">> %d %d\n", i, j);
@@ -152,6 +155,8 @@ int main(){
 
 		}
 	}
+
+	/***********************************************************************************/
 
 	for(int i=0;i<MAX_CHARS;i++){
 		//if (debug) printf(" %d - %d %d\n", i, wordMap[i], myWordMap[i]);
@@ -165,6 +170,16 @@ int main(){
 			return 0;
 		}
 	}
+
+	// Find any # squares exist, if yes, say impossible
+	for(int i=0;i<rows-1;i++){
+		for(int j=0;j<cols-1;j++){
+			if(p[i][j]=='#' && p[i+1][j]=='#' && p[i][j+1]=='#' && p[i+1][j+1]=='#'){
+				printf("IMPOSSIBLE\n");
+				return 0;	
+			}
+		}
+	}	
 
 	/***********************************************************************************/
 
@@ -195,7 +210,7 @@ int main(){
 		if (debug) printf("\n%s (%d)> \n", word, len);
 
 		if(wordMap[len]>1){
-				filler(rows, cols, p, word, len, 1);
+			filler(rows, cols, p, word, len, 1);
 		}
 	}
 
@@ -248,6 +263,9 @@ int filler(int rows, int cols, char **buffer, char *word, int len, int round){
 					if(debug) printf(" Possible >\n");
 
 					for (int j2=0;j2<len;j2++){
+						if(i>0 && buffer[i-1][j+j2] != '*'){
+							return -1;
+						}
 						buffer[i][j + j2] = word[j2];
 					}
 					used = 1;
@@ -278,7 +296,7 @@ int filler(int rows, int cols, char **buffer, char *word, int len, int round){
 
 				// round=0 > fill it. round==1 > fill only if exist a linked letter
 				if (possible==1 && ( (i+len >= rows) || (buffer[i+len][j] == '*' || buffer[i+len][j] == 0)) && (i==0 || buffer[i-1][j]!='#') && (round==0 || (round==1 && linkedLetters>0))){
-					if(debug) printf(" Possible v\n");
+					if(debug) printf(" Possible\n");
 
 					for (int i2=0;i2<len;i2++){
 						buffer[i + i2][j] = word[i2];
@@ -299,6 +317,9 @@ int filler(int rows, int cols, char **buffer, char *word, int len, int round){
 				if (j<cols-1 && buffer[i][j+1]=='*') ok++; 	// >
 				if (i>0 && buffer[i-1][j]=='*') ok++; 		// ^
 				if (i<rows-1 && buffer[i+1][j]=='*') ok++; 	// V
+
+				if(j==0 || j==cols-1) ok++;				// add missed values
+				if(i==0 || i==rows-1) ok++;				// add missed values
 
 				if(ok==4){
 					if (debug) printf("  >> %d %d\n\n", i, j);
