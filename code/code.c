@@ -4,7 +4,8 @@
 #include <stdlib.h>
 #include <ctype.h>
 
-#define MAX_CHARS 8
+#define MAX_CHARS 16
+#define MAX_LINES 48
 
 int filler(int rows, int cols, char **buffer, char *word, int len, int round);
 
@@ -14,7 +15,7 @@ int readFromFile = 0;
 int main(){
 
 	FILE *fp;
-	char buffer[MAX_CHARS][50] = {};						// Assumption
+	char buffer[MAX_CHARS][MAX_LINES] = {};						// Assumption
 	char word[MAX_CHARS];									// Assumption
 	int mode = 0, i=0, j=0, w1=0,rows = 0, cols=0,wordCount = 0,len=0;
 
@@ -162,7 +163,7 @@ int main(){
 		//if (debug) printf(" %d - %d %d\n", i, wordMap[i], myWordMap[i]);
 
 		if(wordMap[i]>1){
-			// two or more same length words
+			// two or more same length words; ignored according to feels message
 
 		}else if (wordMap[i] > myWordMap[i]){
 			// Words exist that length is greater than puzzle spaces
@@ -170,16 +171,6 @@ int main(){
 			return 0;
 		}
 	}
-
-	// Find any # squares exist, if yes, say impossible
-	for(int i=0;i<rows-1;i++){
-		for(int j=0;j<cols-1;j++){
-			if(p[i][j]=='#' && p[i+1][j]=='#' && p[i][j+1]=='#' && p[i+1][j+1]=='#'){
-				printf("IMPOSSIBLE\n");
-				return 0;	
-			}
-		}
-	}	
 
 	/***********************************************************************************/
 
@@ -192,14 +183,14 @@ int main(){
 		if (debug) printf("\n%s (%d)> \n", word, len);
 
 		if(wordMap[len]>1){
-
+			// Nothing
 		}else{
 			filler(rows, cols, p, word, len, 0);
 		}
 
 	}
 
-	// second round filling for words with length=1
+	// second round filling for words which are linked with others
     
 	//for(w1=wordCount-1;w1>=0;w1--){
     for(w1=0;w1<wordCount;w1++){
@@ -211,10 +202,26 @@ int main(){
 
 		if(wordMap[len]>1){
 			filler(rows, cols, p, word, len, 1);
+		}else{
+			// Nothing
 		}
 	}
 
 	if(debug) printf("\n\n>> Results:");
+
+	/* // Not a useful algo
+	// Find any # squares exist, if yes, say impossible
+	for(int i=0;i<rows-1;i++){
+		for(int j=0;j<cols-1;j++){
+
+			//if(p[i][j]!='*' && p[i+1][j]!='*' && p[i][j+1]!='*' && p[i+1][j+1]!='*'){
+			if (isalpha(p[i][j]) && isalpha(p[i+1][j]) && isalpha(p[i][j+1]) && isalpha(p[i+1][j+1])) {
+				printf("IMPOSSIBLE\n");
+				return 0;	
+			}
+		}
+	}*/
+
 
 	for(i=0;i<rows;i++){
 		printf("%s\n", p[i]);
@@ -228,14 +235,16 @@ int filler(int rows, int cols, char **buffer, char *word, int len, int round){
 	int i,j,used=0, linkedLetters=0;
 
 	for(i=0;i<rows;i++){							// each row
+
+		if(used)break;
+
 		for(int j=0;j<=cols;j++){					// each col
-			if(used)break;
 
 			if ((buffer[i][j] == '#' || buffer[i][j]== word[0]) && len>1){
 
 				int i2=i,j2=j,possible=1;
 		
-				//*** try to fit it on horizontal axis ****************************************************************
+				//*** try to fit it on horizontal space ****************************************************************
 
 				possible=1;linkedLetters=0;
 
@@ -258,21 +267,21 @@ int filler(int rows, int cols, char **buffer, char *word, int len, int round){
 					j2++;
 				}
 
-				// round=0 > fill it. round==1 > fill only if exist a linked letter
+				// round=0 -> fill it. round==1 -> fill only if exist a linked letter
 				if (possible==1 && ((j+len)>=cols || (buffer[i][j+len] == '*' || buffer[i][j+len] == 0)) && (j==0 || buffer[i][j-1]!='#') && (round==0 || (round==1 && linkedLetters>0))){
 					if(debug) printf(" Possible >\n");
 
 					for (int j2=0;j2<len;j2++){
-						if(i>0 && buffer[i-1][j+j2] != '*'){
-							return -1;
-						}
+						//if(i>0 && buffer[i-1][j+j2] != '*'){
+							//return -1;
+						//}
 						buffer[i][j + j2] = word[j2];
 					}
 					used = 1;
 					break;
 				}
 		
-				//*** Try to fix it on verticle axis *******************************************************************
+				//*** Try to fix it on verticle space *******************************************************************
 
 				possible = 1;linkedLetters=0;
 
