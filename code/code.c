@@ -223,12 +223,14 @@ int worker(int rows, int cols, char **buffer, char *word, int len, int round){
 		for(int j=0;j<=cols;j++){				// <-- each col
 			if ((buffer[i][j] == '#' || buffer[i][j]== word[0]) && len>1){
 
+				int i2=i,j2=j,possible=1;
+		
+				// try to fit it on horizontal axis ****************************************************************
+				possible=1;linkedLetters=0;
+
+				if(j+len>cols) possible=0;							// impossible if not enough cols
+				if(used==1) possible = 0; 						// Because already used
 				if (debug) printf("  %d %d right >> ", i, j);
-
-				// try to fit it on horizontal axis
-				int j2=j,possible=1;
-
-				if(j+len>cols) possible=0;					// impossible if not enough cols
 
 				while (j2<(len+j) && possible==1){	// try to increase and check word can be fit or not
 
@@ -255,18 +257,17 @@ int worker(int rows, int cols, char **buffer, char *word, int len, int round){
 					used = 1;
 					break;
 				}
-
-				if (debug) printf("\n  %d %d down  >> ", i, j);
-
-				// Try to fix it on verticle axis
-				int i2=i; possible = 1;linkedLetters=0;
+		
+				// Try to fix it on verticle axis *******************************************************************
+				possible = 1;linkedLetters=0;
 
 				if(i+len>rows) possible=0;						// impossible if not enough rows
 				if(used==1) possible = 0; 						// Because already used
-
+				if (debug) printf("\n  %d %d down  >> ", i, j);
+				
 				while (i2<(len+i) && possible==1){		// try to increase and check work can be fit or not
 
-					if (buffer[i][j2] == word[j2-j]) {
+					if (buffer[i2][j] == word[i2-i]) {
 						linkedLetters++;		// Find is there any linked leters
 						//printf(">> %d %d (%d)\n", i, j, linkedLetters);
 					}
@@ -289,8 +290,11 @@ int worker(int rows, int cols, char **buffer, char *word, int len, int round){
 					used = 1;
 					break;
 				}
-				if(debug) printf("\n");
 
+				//*********************************************************************************
+				
+				if(debug) printf("\n");
+				
 			} else if (buffer[i][j]=='#' && len==1){
 				// Single character word
 
@@ -304,8 +308,6 @@ int worker(int rows, int cols, char **buffer, char *word, int len, int round){
 					if (debug) printf("  >> %d %d\n\n", i, j);
 					buffer[i][j] = word[0];
 				}
-
-
 			}
 		}
 	}
