@@ -1,3 +1,7 @@
+/************************************
+	CO222 Course Project
+	Jaliyagoda A.J.N.M. (E/15/140)
+************************************/
 
 #include <stdio.h>
 #include <string.h>
@@ -19,8 +23,6 @@ int main(){
 	char word[MAX_CHARS];									// Assumption
 	int mode = 0, i=0, j=0, w1=0,rows = 0, cols=0,wordCount = 0,len=0;
 
-	if(debug) printf(">>Enter Puzzle:\n");
-
 	if(readFromFile==1){
 		fp = fopen("test06.inp", "r");						// Read inputs from this file than stdin
 	}	
@@ -37,11 +39,8 @@ int main(){
 		if(buffer[i][j]=='\n'){
 			if((buffer[i][0]=='\n')){
 				mode++;
-				if(mode==1){
-					if(debug) printf(">> Enter words:\n");
-				}
-			}else{
-				// Not an empty line
+				
+			}else{											// Not an empty line
 				buffer[i][j] = '\0';
 
 				if(mode==0) {								// mode0 = puzzle
@@ -52,7 +51,6 @@ int main(){
 				if(mode==1) wordCount++;					// mode1 = words
 			}
 			i++;j=0;
-
 		}else{
 			j++;
 		}
@@ -143,7 +141,7 @@ int main(){
 				if (j>0 && p[i][j-1]!='#') ok++; 		// <
 				if (j<cols-1 && p[i][j+1]!='#') ok++; 	// >
 				if (i>0 && p[i-1][j]!='#') ok++; 		// ^
-				if (i<rows-1 && p[i+1][j]!='#') ok++; 	// V
+				if (i<rows-1 && p[i+1][j]!='#') ok++; 	// v
 
 				if(j==0 || j==cols-1) ok++;				// add missed values
 				if(i==0 || i==rows-1) ok++;				// add missed values
@@ -153,7 +151,6 @@ int main(){
 					if(debug) printf(">> %d %d\n", i, j);
 				}
 			}
-
 		}
 	}
 
@@ -163,7 +160,7 @@ int main(){
 		//if (debug) printf(" %d - %d %d\n", i, wordMap[i], myWordMap[i]);
 
 		if(wordMap[i]>1){
-			// two or more same length words; ignored according to feels message
+			// two or more same length words; ignored according to the feels message
 
 		}else if (wordMap[i] > myWordMap[i]){
 			// Words exist that length is greater than puzzle spaces
@@ -175,7 +172,6 @@ int main(){
 	/***********************************************************************************/
 
 	for(w1=wordCount-1;w1>=0;w1--){
-    //for(w1=0;w1<wordCount;w1++){
 		int len  = wLen[w1];
 		char word[MAX_CHARS];
 
@@ -187,12 +183,9 @@ int main(){
 		}else{
 			filler(rows, cols, p, word, len, 0);
 		}
-
 	}
-
-	// second round filling for words which are linked with others
     
-	//for(w1=wordCount-1;w1>=0;w1--){
+	// second round filling for words which are linked with others
     for(w1=0;w1<wordCount;w1++){
 		int len  = wLen[w1];
 		char word[MAX_CHARS];
@@ -209,7 +202,7 @@ int main(){
 
 	if(debug) printf("\n\n>> Results:");
 
-	/* // Not a useful algo
+	/* // Commented out because it is not a useful algo
 	// Find any # squares exist, if yes, say impossible
 	for(int i=0;i<rows-1;i++){
 		for(int j=0;j<cols-1;j++){
@@ -221,7 +214,6 @@ int main(){
 			}
 		}
 	}*/
-
 
 	for(i=0;i<rows;i++){
 		printf("%s\n", p[i]);
@@ -235,11 +227,9 @@ int filler(int rows, int cols, char **buffer, char *word, int len, int round){
 	int i,j,used=0, linkedLetters=0;
 
 	for(i=0;i<rows;i++){							// each row
-
 		if(used)break;
 
 		for(int j=0;j<=cols;j++){					// each col
-
 			if ((buffer[i][j] == '#' || buffer[i][j]== word[0]) && len>1){
 
 				int i2=i,j2=j,possible=1;
@@ -337,6 +327,5 @@ int filler(int rows, int cols, char **buffer, char *word, int len, int round){
 			}
 		}
 	}
-
 	return 0;
 }
